@@ -1,11 +1,8 @@
 import os.path as osp
+from random import randrange
 import json
 import IPython.display as ipd
-
-
-utils_dir = osp.dirname(osp.realpath(__file__))
-ipd.display(ipd.Javascript(filename=osp.join(utils_dir, "js", "sprite_visualizer.js")))
-ipd.display(ipd.HTML(filename=osp.join(utils_dir, "js", "sprite_visualizer.css.html")))
+import dlight
 
 
 def visualize_sprites(embedding, atlas, sprite_size_in_3D=None, initial_camera_z=60.0):
@@ -16,7 +13,8 @@ def visualize_sprites(embedding, atlas, sprite_size_in_3D=None, initial_camera_z
             of sprites in atlas (left to right first, then top to bottom)
         atlas ([dict]): dict with the following items:
             {
-                "path": path to PNG file of atlas. Should be relative to the root dir of the Jupyter notebook
+                "path": path to PNG file of atlas. Should be relative to /usr/local/share/jupyter
+                        See https://stackoverflow.com/a/49487396/13344574
                 "shape": {"rows": num_rows_in_atlas, "cols": num_cols_in_atlas},
                 "num_sprites": number of sprites within the atlas,
                 "sprite_size": {"height": height of single sprite,
@@ -32,9 +30,6 @@ def visualize_sprites(embedding, atlas, sprite_size_in_3D=None, initial_camera_z
     if sprite_size_in_3D is None:
         sprite_size_in_3D = {'height': 4.0, "width": 4.0}
 
-    # The root folder (where jupyter was launched) is represented as /notebooks in jupyter notebook. That's why baseUrl is /notebooks/
-    atlas["path"] = '/notebooks/' + atlas["path"]
-
     data = {
         "embedding": embedding,
         "atlas": atlas,
@@ -42,10 +37,15 @@ def visualize_sprites(embedding, atlas, sprite_size_in_3D=None, initial_camera_z
         "initial_camera_z": initial_camera_z
     }
 
+    dlight.load_js_libs()
+    utils_dir = osp.dirname(osp.realpath(__file__))
+    ipd.display(ipd.Javascript(filename=osp.join(utils_dir, "js", "sprite_visualizer.js")))
+    ipd.display(ipd.HTML(filename=osp.join(utils_dir, "js", "sprite_visualizer.css.html")))
+
+    container_id = "sprite-visualizer-container-" + str(randrange(1000))
+    ipd.display(ipd.HTML("<div id='{}'></div> ".format(container_id)))
     ipd.display(ipd.Javascript("""
-            (function(element){{
-                require(['sprite_visualizer'], function(sprite_visualizer) {{
-                    sprite_visualizer(element.get(0), {});
-                }});
-            }})(element);
-        """.format(json.dumps(data))))
+            require(['sprite_visualizer'], function(sprite_visualizer) {{
+                sprite_visualizer(document.getElementById("{}"), {});
+            }});
+        """.format(container_id, json.dumps(data))))

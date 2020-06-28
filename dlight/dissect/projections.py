@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 from random import randrange
 import uuid
 import imageio
@@ -64,12 +65,18 @@ def project_fc_activations(inputs, activations, projections_pipe):
                 x_offset = x * image_width
                 atlas[:, y_offset : y_offset + image_height, x_offset : x_offset + image_width] = img_RGBA
 
-    tmp_dir = "tmp"
-    if not os.path.exists(tmp_dir):
-        os.makedirs(tmp_dir)
-    atlas_path = os.path.join(tmp_dir, "atlas_" + str(uuid.uuid4()) + ".png")
+    # We need to put the image in jupyter dir to access it from Javascript.
+    # See https://stackoverflow.com/a/49487396/13344574
+    jupyter_dir = osp.abspath("/usr/local/share/jupyter")
+    atlas_path = osp.join(
+        "nbextensions", "tmp", "atlas_" + str(uuid.uuid4()) + ".png")
+
+    atlas_dir = osp.dirname(osp.join(jupyter_dir, atlas_path))
+    if not osp.exists(atlas_dir):
+        os.makedirs(atlas_dir)
+    
     atlas = (atlas * 255.0).byte() # convert to uint8
-    imageio.imwrite(atlas_path, atlas.permute(1, 2, 0).numpy())
+    imageio.imwrite(osp.join(jupyter_dir, atlas_path), atlas.permute(1, 2, 0).numpy())
     
     embedding = activations.numpy()
     print("Shape of initial embedding = ", embedding.shape)
@@ -113,7 +120,6 @@ def project_fc_activations(inputs, activations, projections_pipe):
     showing.visualize_sprites(
         embedding,
         {
-            # atlas_path[len(PROJECT_DIR)+1:].replace('\\', '/'), TODO remove after testing on notebook
             "path": atlas_path,
             "shape": {"rows": atlas_number_of_rows, "cols": atlas_number_of_cols},
             "num_sprites": num_images,

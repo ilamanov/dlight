@@ -1,13 +1,10 @@
 import os.path as osp
+from random import randrange
 import json
 import IPython.display as ipd
 import torch
 import torch.nn as nn
-save git before changing to nbextensions
-
-dissect_dir = osp.dirname(osp.realpath(__file__))
-ipd.display(ipd.Javascript(filename=osp.join(dissect_dir, "js", "conv_dissection.js")))
-ipd.display(ipd.HTML(filename=osp.join(dissect_dir, "js", "conv_dissection.css.html")))
+import dlight
 
 
 def show_conv_dissection(input_to_conv, node, outer_idx, input_description=None):
@@ -55,13 +52,18 @@ def show_conv_dissection(input_to_conv, node, outer_idx, input_description=None)
     if input_description is not None:
         data["input_description"] = input_description
 
+    dlight.load_js_libs()
+    dissect_dir = osp.dirname(osp.realpath(__file__))
+    ipd.display(ipd.Javascript(filename=osp.join(dissect_dir, "js", "conv_dissection.js")))
+    ipd.display(ipd.HTML(filename=osp.join(dissect_dir, "js", "conv_dissection.css.html")))
+
+    container_id = "conv-dissection-container-" + str(randrange(1000))
+    ipd.display(ipd.HTML("<div id='{}'></div> ".format(container_id)))
     ipd.display(ipd.Javascript("""
-        (function(element){{
             require(['conv_dissection'], function(conv_dissection) {{
-                conv_dissection(element.get(0), {});
+                conv_dissection(document.getElementById("{}"), {});
             }});
-        }})(element);
-    """.format(json.dumps(data))))
+        """.format(container_id, json.dumps(data))))
 
 
 def get_conv_dissection(input_to_conv, node, outer_idx):
