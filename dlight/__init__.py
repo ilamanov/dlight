@@ -5,6 +5,12 @@ import IPython.display as ipd
 import dlight.utils.css_style
 import os.path as osp
 
+# Add requirejs. See https://github.com/googlecolab/colabtools/issues/461#issuecomment-469854101
+def add_require_js():
+  ipd.display(ipd.HTML('<script src="/static/components/requirejs/require.js"></script>'))
+
+get_ipython().events.register('pre_run_cell', add_require_js)
+
 
 def load_js_libs():
   # to inspect require config: require.s.contexts._.config
@@ -41,4 +47,3 @@ def load_js_libs():
   """))
 
   ipd.display(ipd.HTML(dlight.utils.css_style.global_style))
-  

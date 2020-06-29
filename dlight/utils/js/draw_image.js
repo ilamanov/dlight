@@ -9,8 +9,10 @@ define("draw_image", ["d3"], function (d3) {
      * {
      *   image_height: output image height
      *   image_width: output image width
-     *   callback_name: name of python function defined in the notebook
-     *                  called when the drawn image is changed
+     *   callback_name: the name of the callback to call.
+     *                  the callback should have been registered with
+     *                  google.colab.output.
+     *                  See JS to PY communication: https://colab.research.google.com/notebooks/snippets/advanced_outputs.ipynb#scrollTo=Ytn7tY-C9U0T
      * }
      */
 
@@ -22,11 +24,6 @@ define("draw_image", ["d3"], function (d3) {
 
     const erase_button_inactive_color = "#b8b7b4"; // grey
     const erase_button_active_color = "#0b8e23"; // green
-
-    const code_cell = IPython.notebook.insert_cell_below("code");
-    code_cell.set_text(
-      "DO NOT REMOVE. Placeholder for callback of draw_image."
-    );
 
     container = d3.select(container);
     const body = container.append("div");
@@ -152,21 +149,19 @@ define("draw_image", ["d3"], function (d3) {
     function img_change_callback() {
       img_change_timeout = null;
 
-      get_image_array((image_array) => {
-        IPython.notebook.kernel.execute(
-          "_drawing_image_array = " + JSON.stringify(image_array)
-        );
+      get_image_array(async function (image_array) {
+        // TODO describe how to make everything work in Jupyter on github (sync to a previous commit)
 
-        const command = `${callback_name}(_drawing_image_array)`;
-        console.log("Executing command: " + command);
+        // JS to PY communication.
+        // See https://colab.research.google.com/notebooks/snippets/advanced_outputs.ipynb#scrollTo=Ytn7tY-C9U0T
+        const result = await google.colab.kernel.invokeFunction(
+          "notebook." + callback_name, // The callback name.
+          [JSON.stringify(image_array)], // The arguments.
+          {}
+        ); // kwargs
 
-        code_cell.set_text(command);
-        code_cell.execute();
-
-        d3.select(code_cell.element[0])
-          .style("background-color", "green")
-          .transition(svg_transition)
-          .style("background-color", "transparent");
+        const output = result.data["application/json"];
+        console.log("callback in draw_image successful. ", output);
 
         d3.select(canvas).remove();
       });
@@ -185,6 +180,9 @@ define("draw_image", ["d3"], function (d3) {
         .append("canvas")
         .attr("height", image_height)
         .attr("width", image_width)
+        // make it invisible
+        .style("opacity", 0.0)
+        .style("position", "absolute")
         .node();
 
       var ctx = canvas.getContext("2d");
