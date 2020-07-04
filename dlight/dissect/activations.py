@@ -166,7 +166,8 @@ def get_image_superstimuli(forward_funcs, initial_input,
             Only inputs of type "image" are supported in this function. Must have the shape ([1, C, H, W]).
             Tensors of this shape should be consumable by forward_funcs.
             Usually initial_input is a randomly initialized Tensor which is sampled from the
-            same distribution as the training input to the model. See notebook (TODO which one)
+            same distribution as the training input to the model.
+            See Colab notebook (https://colab.research.google.com/drive/1GqynTl2NhVPMUk3LCOQ91yXGsLf1UmJj?usp=sharing)
             for example usage.
 
     Returns:

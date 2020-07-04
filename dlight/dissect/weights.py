@@ -2,8 +2,6 @@ import torch.nn as nn
 import torchvision
 import dlight.utils.image as dimage
 
-# TODO describe in Terminology page on github what is outer and inner idx
-
 def show_weights(node, params, num_cols=16, figsize=(20, 20), clf=True):
     """ Show weights of the node.
 

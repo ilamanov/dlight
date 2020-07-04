@@ -8,7 +8,7 @@ import dlight
 
 
 def show_conv_dissection(input_to_conv, node, outer_idx, input_description=None):
-    """ Conv dissection consists of the following columns (TODO see medium article for definition of each column):
+    """ Conv dissection consists of the following columns (TODO see medium article for definition of each column, also which section):
         - input to convolutional layer
         - (optional) description of the input
         - index of each input to convolutional layer
