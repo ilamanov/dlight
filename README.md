@@ -9,4 +9,4 @@ The code has only been tested in a Colab environment, it might not work in Jupyt
 
 ## Terminology used in the code.
 
-Outer and inner channels (or indices) of convolutions - See the arguments of [torch.nn.Conv2d](https://pytorch.org/docs/master/generated/torch.nn.Conv2d.html#torch.nn.Conv2d).
+Meaning of "outer" and "inner" channels (or indices) of convolutions - See the arguments of [torch.nn.Conv2d](https://pytorch.org/docs/master/generated/torch.nn.Conv2d.html#torch.nn.Conv2d).
