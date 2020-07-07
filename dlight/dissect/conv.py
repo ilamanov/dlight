@@ -8,7 +8,7 @@ import dlight
 
 
 def show_conv_dissection(input_to_conv, node, outer_idx, input_description=None):
-    """ Conv dissection consists of the following columns (TODO see medium article for definition of each column, also which section):
+    """ Conv dissection consists of the following columns
         - input to convolutional layer
         - (optional) description of the input
         - index of each input to convolutional layer
@@ -16,6 +16,8 @@ def show_conv_dissection(input_to_conv, node, outer_idx, input_description=None)
         - intermediate activations 
         - cumulative activations
         - output
+        (See the figure title "Dissected activation of conv2_3" in https://towardsdatascience.com/explainable-mnist-classification-dissection-of-a-convnet-f32910d52842
+        for the definition of each column.)
 
     Args:
         input_to_conv ([Tensor]): expected shape [B, C, H, W]
